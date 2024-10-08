@@ -2,13 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { Appointment } from './entities/appointment.entity';
 
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
+  @Post('create')
+  createAppointment(@Body() createAppointmentDto: CreateAppointmentDto):Promise<Appointment> {
     return this.appointmentService.create(createAppointmentDto);
   }
 

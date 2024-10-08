@@ -18,7 +18,8 @@ import { Appointment } from './appointment/entities/appointment.entity';
       password:'root',
       database:'Turnero_db',
       entities:[Customer,Appointment],
-      synchronize:true,
+      synchronize:false,//esta en false para que no joda que las tablas ya esta creadas
+      //revisar como poder solucionar de una mejor manera
     }),
     CustomersModule,
     AppointmentModule,

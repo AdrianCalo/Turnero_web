@@ -26,9 +26,9 @@ const Turnero= ()=>{
     const availableHours= useAvailableHours(selectedDate);
     const [selectedHour,setSelectedHour]=useState(null);
     const [customerData,setCustomerData]=useState({
-        name:'',
-        lastName:'',
-        contact:''
+        nombre:'',
+        apellido:'',
+        contacto:''
     });
 
     const handleChange=(e)=>{
@@ -40,25 +40,43 @@ const Turnero= ()=>{
     };
 
     const handleSubmit= async(e)=>{
-        e.prevenDefault();
+        e.preventDefault();
+
+        try{
+            //paso 1: crea el cliente
+            const customerResponse= await fetch('http://localhost:3000/customers/create',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                },
+                body:JSON.stringify(customerData)
+            });
+
+            const customer= await customerResponse.json();
+        
+        //verificamos si el cliente fue creado correctamente y contiene el "clienteId"
+            if(!customer || !customer.clienteId){
+                throw new Error('error al crear el cliente')
+            }
+        //paso 2: crear turno
 
         const appointmentData={
-            ...customerData,
-            date:selectedDate,
-            hour:selectedHour,
+            fecha:selectedDate.toLocaleDateString('es-AR'),//para convertir la fecha al formato correcto
+            hora:selectedHour,
+            customer:customer.clienteId //enlazamos e truno con el ID del cliente
         };
         //aca hacemos llamada a la API para guardar el turno
 
-        try{
-            const response= await fetch('poner URL',{
+        const appointmentresponse= await fetch('http://localhost:3000/appointment/create',{
                 method:'POST',
                 headers:{
                     'Content-Type':'application/json',
                 },
                 body:JSON.stringify(appointmentData),
             });
-            const result= await response.json();
-            console.log('cita gaurdada', result);
+          
+            const result= await appointmentresponse.json();
+            console.log('Turno guardado', result);
             //puedes mostrar un mensaje de exito al usuario aca
         }catch (error){
             console.error('Error al guardar turno:', error);
@@ -71,9 +89,9 @@ const Turnero= ()=>{
             <form onSubmit={handleSubmit}>
                  {/* Formulario para los datos del cliente */}
                 <div>
-                    <input type="text" name="name" placeholder="Nombre" onChange={handleChange} required />
-                    <input type="text" name="lastName" placeholder="Apellido" onChange={handleChange} required />
-                    <input type="tel" name="contact" placeholder="Teléfono" onChange={handleChange} required />
+                    <input type="text" name="nombre" placeholder="Nombre" onChange={handleChange} required />
+                    <input type="text" name="apellido" placeholder="Apellido" onChange={handleChange} required />
+                    <input type="tel" name="contacto" placeholder="Teléfono" onChange={handleChange} required />
                     <button type="submit">Reservar Turno</button>
                 </div>
                 <div>
